@@ -10,6 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
@@ -18,7 +22,10 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 class MainActivity : ComponentActivity() {
@@ -39,6 +46,7 @@ class MainActivity : ComponentActivity() {
         ) == PackageManager.PERMISSION_GRANTED -> {
 
         }
+
         else -> {
             requestPermissionLauncher.launch(ACCESS_FINE_LOCATION)
         }
@@ -70,11 +78,28 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(horsens, 10f)
     }
+    val uiSettings by remember {
+        mutableStateOf(
+            MapUiSettings(
+                myLocationButtonEnabled = true,
+                zoomControlsEnabled = false,
+                compassEnabled = true,
+                mapToolbarEnabled = true,
+                rotationGesturesEnabled = true, tiltGesturesEnabled = true
+            )
+        )
+    }
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState
+        cameraPositionState = cameraPositionState,
+        uiSettings = uiSettings,
+        properties = MapProperties(isMyLocationEnabled = true)
     ) {
-
+        Marker(
+            state = MarkerState(position = horsens),
+            title = "Run event",
+            snippet = "run like hell is on your ass"
+        )
     }
 }
 
