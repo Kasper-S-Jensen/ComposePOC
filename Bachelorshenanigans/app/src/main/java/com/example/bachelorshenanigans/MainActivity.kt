@@ -1,15 +1,14 @@
 package com.example.bachelorshenanigans
+
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.FloatingActionButton
@@ -20,7 +19,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Check
@@ -33,7 +31,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -77,12 +74,13 @@ class MainActivity : ComponentActivity() {
         askPermissions()
         setContent {
             BachelorshenanigansTheme {
-                // A surface container using the 'background' color from the theme
+                loadEventList()
                 MainScreen()
             }
         }
     }
 }
+
 
 
 @Composable
@@ -94,7 +92,7 @@ fun MainScreen(modifier: Modifier = Modifier) {
             TopAppBar(
 
                 title = {
-                    Text("Top app bar")
+                    Text("Event app")
                 }
             )
         },
@@ -127,11 +125,13 @@ fun MainScreen(modifier: Modifier = Modifier) {
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-
                 presses++
-                Toast.makeText(context, "Press count: $presses", Toast.LENGTH_LONG).show()
             }) {
-                Icon(Icons.Default.Build, contentDescription = "Add")
+                Column {
+                    Icon(Icons.Default.Build, contentDescription = "Add")
+                    Text(text = presses.toString())
+                }
+
             }
         }
     ) { innerPadding ->
@@ -151,7 +151,7 @@ fun Map() {
 
     val horsens = LatLng(55.862207, 9.844651)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(horsens, 10f)
+        position = CameraPosition.fromLatLngZoom(horsens, 15f)
     }
     val uiSettings by remember {
         mutableStateOf(
@@ -170,13 +170,32 @@ fun Map() {
         uiSettings = uiSettings,
         properties = MapProperties(isMyLocationEnabled = true)
     ) {
-        Marker(
-            state = MarkerState(position = horsens),
-            title = "Run event",
-            snippet = "run like hell is on your ass"
-        )
+        eventList.forEach {
+            Marker(
+                state = MarkerState(position = it.location),
+                title = it.name,
+                snippet = "description"
+
+            )
+        }
+
     }
 }
+
+
+fun loadEventList() {
+    eventList.add(event1)
+    eventList.add(event2)
+    eventList.add(event3)
+}
+
+class Event(val name: String, val location: LatLng)
+
+val eventList = mutableListOf<Event>()
+var event1 = Event("Run event", LatLng(55.862207, 9.844651))
+var event2 = Event("Dance event", LatLng(55.872207, 9.744651))
+var event3 = Event("Drunk event", LatLng(55.882207, 9.644651))
+
 
 @Preview(showBackground = true)
 @Composable
